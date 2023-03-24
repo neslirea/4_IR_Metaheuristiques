@@ -1,10 +1,13 @@
 package jobshop.solvers.neighborhood;
 
 import jobshop.encodings.ResourceOrder;
+import jobshop.encodings.Schedule;
+import jobshop.encodings.Task;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** Implementation of the Nowicki and Smutnicki neighborhood.
@@ -87,7 +90,25 @@ public class Nowicki extends Neighborhood {
          *  The original ResourceOrder MUST NOT be modified by this operation.
          */
         public ResourceOrder generateFrom(ResourceOrder original) {
-            throw new UnsupportedOperationException();
+            ResourceOrder res = new ResourceOrder(original.instance);
+
+            for (int m = 0; m < original.instance.numMachines; m++) {
+                for (int t = 0; t < original.instance.numJobs; t++) {
+                    Task current = original.getTaskOfMachine(m, t);
+
+                    if (t == this.t1 && m == this.machine) {
+                        res.addTaskToMachine(m, original.getTaskOfMachine(m, t2));
+                    }
+                    else if (t == this.t2 && m == this.machine) {
+                        res.addTaskToMachine(m, original.getTaskOfMachine(m, t1));
+                    }
+                    else {
+                        res.addTaskToMachine(m, current);
+                    }
+                }
+            }
+
+            return res;
         }
 
         @Override
@@ -126,12 +147,49 @@ public class Nowicki extends Neighborhood {
 
     /** Returns a list of all the blocks of the critical path. */
     List<Block> blocksOfCriticalPath(ResourceOrder order) {
-        throw new UnsupportedOperationException();
+        Schedule s = order.toSchedule().get();
+        List<Task> critical = s.criticalPath();
+        List<Block> res = new ArrayList<>();
+        int current_machine = -1;
+        for(int i = 0; i<order.instance.numMachines; i++){
+            int last_critical=-1;
+            for (int j=0; j<order.instance.numJobs; j++){
+                Task t = order.getTaskOfMachine(i,j);
+
+                // début d'une section critique
+                if(critical.contains(t)&&last_critical==-1){
+                    last_critical = j;
+                }
+                // fin d'une section critique
+                else if(!critical.contains(t)&&last_critical!=-1){
+                    if(j-last_critical>1){
+                        res.add(new Block(i, last_critical, j-1));
+                    }
+                    last_critical = -1;
+                }
+                // On arrive à la fin et on est sur une section critique
+                else if(j==order.instance.numJobs-1&&last_critical!=-1){
+                    res.add(new Block(i, last_critical, j));
+                }
+            }
+        }
+        return res;
     }
 
     /** For a given block, return the possible swaps for the Nowicki and Smutnicki neighborhood */
     List<Swap> neighbors(Block block) {
-        throw new UnsupportedOperationException();
+        List<Swap> res = new ArrayList<>();
+
+        if (block.firstTask == block.lastTask-1) {
+            res.add(new Swap(block.machine, block.firstTask, block.lastTask));
+        }
+
+        else {
+            res.add(new Swap(block.machine, block.firstTask, block.firstTask+1));
+            res.add(new Swap(block.machine, block.lastTask-1, block.lastTask));
+        }
+
+        return res;
     }
 
 }
