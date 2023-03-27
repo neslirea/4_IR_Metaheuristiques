@@ -90,24 +90,8 @@ public class Nowicki extends Neighborhood {
          *  The original ResourceOrder MUST NOT be modified by this operation.
          */
         public ResourceOrder generateFrom(ResourceOrder original) {
-            ResourceOrder res = new ResourceOrder(original.instance);
-
-            for (int m = 0; m < original.instance.numMachines; m++) {
-                for (int t = 0; t < original.instance.numJobs; t++) {
-                    Task current = original.getTaskOfMachine(m, t);
-
-                    if (t == this.t1 && m == this.machine) {
-                        res.addTaskToMachine(m, original.getTaskOfMachine(m, t2));
-                    }
-                    else if (t == this.t2 && m == this.machine) {
-                        res.addTaskToMachine(m, original.getTaskOfMachine(m, t1));
-                    }
-                    else {
-                        res.addTaskToMachine(m, current);
-                    }
-                }
-            }
-
+            ResourceOrder res = new ResourceOrder(original);
+            res.swapTasks(machine,t1,t2);
             return res;
         }
 
@@ -150,29 +134,51 @@ public class Nowicki extends Neighborhood {
         Schedule s = order.toSchedule().get();
         List<Task> critical = s.criticalPath();
         List<Block> res = new ArrayList<>();
-        int current_machine = -1;
         for(int i = 0; i<order.instance.numMachines; i++){
             int last_critical=-1;
             for (int j=0; j<order.instance.numJobs; j++){
                 Task t = order.getTaskOfMachine(i,j);
 
+                int toadd =-1;
                 // début d'une section critique
                 if(critical.contains(t)&&last_critical==-1){
                     last_critical = j;
                 }
+                // On arrive à la fin et on est sur une section critique
+                else if(j==order.instance.numJobs-1&&last_critical!=-1){
+                    toadd = j;
+                    // non consécutif sur le chemin critique
+                    if(critical.indexOf(t)!=critical.indexOf(order.getTaskOfMachine(i,j-1))+1){
+                        if(j-1!=last_critical) {
+                            res.add(new Block(i, last_critical, j-1));
+                        }
+                    }
+                }
+                // On est au mileu on doit verif si c'est bien concurrent sur le chemin critique, sinon ça compte pas
+                else if (critical.contains(t)){
+                    int last_t = critical.indexOf(order.getTaskOfMachine(i,j-1));
+                    // Au milieu + non consécutif sur le chemin critique
+                    if(critical.indexOf(t)!=last_t+1){
+                        if(j-1!=last_critical) {
+                            res.add(new Block(i, last_critical, j-1));
+                        }
+                        last_critical = j;
+                    }
+                }
                 // fin d'une section critique
                 else if(!critical.contains(t)&&last_critical!=-1){
-                    if(j-last_critical>1){
-                        res.add(new Block(i, last_critical, j-1));
+                    toadd = j-1;
+                }
+                if(toadd!=-1){
+                    if(toadd-last_critical>0) {
+                        res.add(new Block(i, last_critical, toadd));
                     }
                     last_critical = -1;
                 }
-                // On arrive à la fin et on est sur une section critique
-                else if(j==order.instance.numJobs-1&&last_critical!=-1){
-                    res.add(new Block(i, last_critical, j));
-                }
+
             }
         }
+
         return res;
     }
 

@@ -3,6 +3,7 @@ package jobshop.solvers;
 import jobshop.Instance;
 import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Schedule;
+import jobshop.encodings.Task;
 import jobshop.solvers.neighborhood.Neighborhood;
 import jobshop.solvers.neighborhood.Nowicki;
 
@@ -30,20 +31,29 @@ public class DescentSolver implements Solver {
 
         long starting_time = System.currentTimeMillis();
 
-        Optional<Schedule> solution_schedule = baseSolver.solve(instance,deadline);
-        ResourceOrder solution_ro = new ResourceOrder(solution_schedule.get());
+        Optional<Schedule> best_sol = baseSolver.solve(instance,deadline);
+
+
+        ResourceOrder solution_ro = new ResourceOrder(best_sol.get());
         List<ResourceOrder> neighbors = neighborhood.generateNeighbors(solution_ro);
-        Optional<Schedule> best_sol = solution_schedule;
 
-        int makespan = solution_schedule.get().makespan();
-
-        for (ResourceOrder ro : neighbors) {
-            Optional<Schedule> candidate = ro.toSchedule();
-            if (candidate.isPresent() && candidate.get().isValid() && candidate.get().makespan() < makespan) {
-                makespan = candidate.get().makespan();
-                best_sol = candidate;
+        boolean ameliorant = true;
+        while(ameliorant && deadline<System.currentTimeMillis()-starting_time){
+            ameliorant = false;
+            int makespan = best_sol.get().makespan();
+            for (ResourceOrder ro : neighbors) {
+                Optional<Schedule> candidate = ro.toSchedule();
+                if (candidate.isPresent() && candidate.get().isValid() && candidate.get().makespan() < makespan) {
+                    makespan = candidate.get().makespan();
+                    best_sol = candidate;
+                    ameliorant=true;
+                }
             }
+            solution_ro = new ResourceOrder(best_sol.get());
+            neighbors = neighborhood.generateNeighbors(solution_ro);
         }
+
+
 
         return best_sol;
     }
