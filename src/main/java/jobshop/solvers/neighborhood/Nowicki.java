@@ -138,43 +138,34 @@ public class Nowicki extends Neighborhood {
             int last_critical=-1;
             for (int j=0; j<order.instance.numJobs; j++){
                 Task t = order.getTaskOfMachine(i,j);
-
-                int toadd =-1;
-                // début d'une section critique
+                // start of a critical cession
                 if(critical.contains(t)&&last_critical==-1){
                     last_critical = j;
                 }
-                // On arrive à la fin et on est sur une section critique
-                else if(j==order.instance.numJobs-1&&last_critical!=-1){
-                    toadd = j;
-                    // non consécutif sur le chemin critique
-                    if(critical.indexOf(t)!=critical.indexOf(order.getTaskOfMachine(i,j-1))+1){
+                // middle of the list, critical but non consecutive in the critical path
+                else if((last_critical!=-1&&critical.contains(t))
+                        &&
+                        ((critical.indexOf(t)-1!=critical.indexOf(order.getTaskOfMachine(i,j-1)))
+                            // or end of the list & critical section
+                            || j==order.instance.numJobs-1))
+                   {
+                    if(critical.indexOf(t)-1!=critical.indexOf(order.getTaskOfMachine(i,j-1))){
                         if(j-1!=last_critical) {
                             res.add(new Block(i, last_critical, j-1));
                         }
+                    } else {
+                        res.add(new Block(i, last_critical, j));
                     }
+                   last_critical = j;
                 }
-                // On est au mileu on doit verif si c'est bien concurrent sur le chemin critique, sinon ça compte pas
-                else if (critical.contains(t)){
-                    int last_t = critical.indexOf(order.getTaskOfMachine(i,j-1));
-                    // Au milieu + non consécutif sur le chemin critique
-                    if(critical.indexOf(t)!=last_t+1){
-                        if(j-1!=last_critical) {
-                            res.add(new Block(i, last_critical, j-1));
-                        }
-                        last_critical = j;
-                    }
-                }
-                // fin d'une section critique
+                // end of critical section
                 else if(!critical.contains(t)&&last_critical!=-1){
-                    toadd = j-1;
-                }
-                if(toadd!=-1){
-                    if(toadd-last_critical>0) {
-                        res.add(new Block(i, last_critical, toadd));
+                    if(j-last_critical>1) {
+                        res.add(new Block(i, last_critical, j-1));
                     }
                     last_critical = -1;
                 }
+
 
             }
         }

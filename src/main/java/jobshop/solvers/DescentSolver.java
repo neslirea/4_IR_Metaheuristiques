@@ -38,7 +38,7 @@ public class DescentSolver implements Solver {
         List<ResourceOrder> neighbors = neighborhood.generateNeighbors(solution_ro);
 
         boolean ameliorant = true;
-        while(ameliorant && deadline<System.currentTimeMillis()-starting_time){
+        while(ameliorant && ((System.currentTimeMillis()-starting_time)<deadline)){
             ameliorant = false;
             int makespan = best_sol.get().makespan();
             for (ResourceOrder ro : neighbors) {
