@@ -8,7 +8,7 @@ import java.util.Optional;
 
 /** Common interface that must implemented by all solvers. */
 public interface Solver {
-
+    final static int tabooTimer = 10;
     /** Look for a solution until blocked or a deadline has been met.
      *
      * @param instance Jobshop instance that should be solved.
@@ -30,6 +30,11 @@ public interface Solver {
             case "desc_spt": return new DescentSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.SPT));
             case "desc_est_spt": return new DescentSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_SPT));
             case "desc_est_lrpt": return new DescentSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_LRPT));
+
+            case "taboo_lrpt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.LRPT), tabooTimer);
+            case "taboo_spt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.SPT), tabooTimer);
+            case "taboo_est_spt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_SPT), tabooTimer);
+            case "taboo_est_lrpt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_LRPT), tabooTimer);
             default: throw new RuntimeException("Unknown solver: "+ name);
         }
     }
