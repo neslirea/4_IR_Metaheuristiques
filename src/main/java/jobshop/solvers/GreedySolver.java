@@ -18,10 +18,20 @@ public class GreedySolver implements Solver {
 
     /** Priority that the solver should use. */
     final Priority priority;
+    final double random;
 
     /** Creates a new greedy solver that will use the given priority. */
     public GreedySolver(Priority p) {
         this.priority = p;
+        this.random = 1;
+    }
+    public GreedySolver(Priority p, double random) {
+        this.priority = p;
+        if (random<1 && random>0){
+            this.random = random;
+        } else {
+            this.random =1;
+        }
     }
 
     @Override
@@ -62,7 +72,7 @@ public class GreedySolver implements Solver {
             // choose the next task depending on the chosen priority
             Task next_task = null;
             int best;
-            if(Math.random()<0.95){
+            if(Math.random()<random){
                 switch (this.priority) {
                     case EST_SPT:
                         ArrayList<Task> best_tasks = new ArrayList<>();

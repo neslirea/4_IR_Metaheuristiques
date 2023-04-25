@@ -91,9 +91,9 @@ public class Main {
             for(String s : solversToTest)
                 output.printf("%-30s", s);
             output.println();
-            output.print("instance size  best      ");
+            output.print("instance;size;best;");
             for(String s : solversToTest) {
-                output.print("runtime makespan ecart        ");
+                output.print("runtime;makespan;ecart");
             }
             output.println();
 
@@ -107,7 +107,7 @@ public class Main {
                 Instance instance = Instance.fromFile(path);
 
                 // print some general statistics on the instance
-                output.printf("%-8s %-5s %4d      ",instanceName, instance.numJobs +"x"+instance.numTasks, bestKnown);
+                output.printf("%-8s;%-5s;%4d;",instanceName, instance.numJobs +"x"+instance.numTasks, bestKnown);
 
                 // run all selected solvers on the instance and print the results
                 for(int solverId = 0 ; solverId < solvers.size() ; solverId++) {
@@ -137,7 +137,7 @@ public class Main {
                     avg_runtimes[solverId] += (float) runtime / (float) instances.size();
                     avg_distances[solverId] += dist / (float) instances.size();
 
-                    output.printf("%7d %8s %5.1f        ", runtime, makespan, dist);
+                    output.printf("%7d;%8s;%5.1f", runtime, makespan, dist);
                     output.flush();
                 }
                 output.println();
@@ -145,9 +145,9 @@ public class Main {
 
 
             // we have finished all benchmarks, compute the average solve time and distance of each solver.
-            output.printf("%-8s %-5s %4s      ", "AVG", "-", "-");
+            output.printf("%-8s;%-5s;%4s", "AVG", "-", "-");
             for(int solverId = 0 ; solverId < solversToTest.size() ; solverId++) {
-                output.printf("%7.1f %8s %5.1f        ", avg_runtimes[solverId], "-", avg_distances[solverId]);
+                output.printf("%7.1f;%8s;%5.1f", avg_runtimes[solverId], "-", avg_distances[solverId]);
             }
 
 
