@@ -31,6 +31,11 @@ public interface Solver {
             case "desc_est_spt": return new DescentSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_SPT));
             case "desc_est_lrpt": return new DescentSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_LRPT));
 
+            case "taboo_lrpt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.LRPT), tabooTimer);
+            case "taboo_spt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.SPT), tabooTimer);
+            case "taboo_est_spt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_SPT), tabooTimer);
+            case "taboo_est_lrpt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_LRPT), tabooTimer);
+
             // Random
             case "spt_random": return new GreedySolver(GreedySolver.Priority.SPT, 0.95);
             case "lrpt_random": return new GreedySolver(GreedySolver.Priority.LRPT, 0.95);
@@ -41,10 +46,11 @@ public interface Solver {
             case "desc_est_spt_random": return new DescentSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_SPT, 0.95));
             case "desc_est_lrpt_random": return new DescentSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_LRPT, 0.95));
 
-            case "taboo_lrpt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.LRPT), tabooTimer);
-            case "taboo_spt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.SPT), tabooTimer);
-            case "taboo_est_spt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_SPT), tabooTimer);
-            case "taboo_est_lrpt": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_LRPT), tabooTimer);
+            case "taboo_lrpt_random": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.LRPT, 0.95), tabooTimer);
+            case "taboo_spt_random": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.SPT, 0.95), tabooTimer);
+            case "taboo_est_spt_random": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_SPT, 0.95), tabooTimer);
+            case "taboo_est_lrpt_random": return new TabooSolver(new Nowicki(),new GreedySolver(GreedySolver.Priority.EST_LRPT, 0.95), tabooTimer);
+
             default: throw new RuntimeException("Unknown solver: "+ name);
         }
     }

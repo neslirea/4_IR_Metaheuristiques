@@ -76,8 +76,9 @@ public class TabooSolver implements Solver{
                     }
                 // Taboo mais améliore la meilleure solution
                 } else if (candidate.isPresent() && candidate.get().isValid() && (candidate.get().makespan() < best_makespan)) {
-                    best_sol = candidate;
-                    best_makespan = candidate.get().makespan();
+                    best_neighboor_makespan = candidate.get().makespan();
+                    best_neighboor = candidate;
+                    best_swap = swap;
                 }
             }
             current_sol = best_neighboor;
