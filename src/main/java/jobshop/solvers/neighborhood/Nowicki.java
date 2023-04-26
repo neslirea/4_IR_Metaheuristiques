@@ -165,11 +165,8 @@ public class Nowicki extends Neighborhood {
                     }
                     last_critical = -1;
                 }
-
-
             }
         }
-
         return res;
     }
 
